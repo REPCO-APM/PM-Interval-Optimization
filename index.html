@@ -113,10 +113,10 @@ table.inp input:focus{outline:2px solid var(--blue);border-color:transparent;}
 .adj-card-opt .adj-cell-val.sav{color:var(--green);}
 .adj-cell-val.sav-neg{color:var(--red);}
 /* ── Bath curve section ── */
-.bath-chart-wrap{background:var(--white);border:1px solid var(--border);border-radius:var(--radius);padding:16px;}
+.bath-chart-wrap{background:var(--white);border:1px solid var(--border);border-radius:var(--radius);padding:16px;display:flex;flex-direction:column;flex:1;}
 .bath-chart-title{font-size:13px;font-weight:700;color:var(--dblue);margin-bottom:4px;}
 .bath-chart-meta{font-size:11px;color:var(--text2);margin-bottom:10px;}
-.bath-canvas-wrap{position:relative;height:320px;}
+.bath-canvas-wrap{position:relative;height:320px;flex:1;min-height:320px;}
 /* Equipment tabs */
 .eq-tabs{display:flex;gap:3px;border-bottom:1px solid var(--border);margin-bottom:14px;flex-wrap:wrap;}
 .eq-tab{padding:7px 18px;font-size:13px;font-weight:500;cursor:pointer;border-bottom:2px solid transparent;color:var(--text2);background:none;border-top:none;border-left:none;border-right:none;}
@@ -126,12 +126,13 @@ table.inp input:focus{outline:2px solid var(--blue);border-color:transparent;}
 .eq-panel.active{display:block;}
 /* Result table */
 table.res{width:100%;border-collapse:collapse;font-size:12px;}
-table.res th{background:var(--dblue);color:#fff;padding:7px 9px;text-align:center;font-weight:500;white-space:nowrap;}
+table.res th{background:var(--dblue);color:#fff;padding:7px 6px;text-align:center;font-weight:500;white-space:normal;line-height:1.25;}
 table.res th:first-child{text-align:left;}
-table.res td{padding:6px 9px;border-bottom:1px solid #eee;text-align:right;cursor:pointer;}
+table.res td{padding:13px 9px;border-bottom:1px solid #eee;text-align:right;cursor:pointer;line-height:1.4;}
 table.res td:first-child{text-align:left;}
 table.res tr.sub{background:var(--navy);}
-table.res tr.sub td{border:none;color:#fff;font-weight:700;cursor:default;}
+table.res tr.sub td{border:none;color:#fff;font-weight:700;cursor:pointer;}
+table.res tr.sub:hover td{background:var(--dblue);}
 table.res tbody tr:hover td{background:var(--blue-lt);}
 table.res tbody tr.row-selected td{background:#D4E8FF !important;}
 .sav{color:var(--green);font-weight:700;}
@@ -220,52 +221,45 @@ table.res tbody tr.row-selected td{background:#D4E8FF !important;}
 <!-- ══ RESULT PANEL ══ -->
 <div class="main-panel" id="panel-result">
   <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;flex-wrap:wrap;gap:8px;">
-    <div style="font-size:12px;color:var(--text2)" id="resultMeta"></div>
+    <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
+      <label for="eqFilter" style="font-size:15px;color:var(--navy);font-weight:700;">Filter Equipment:</label>
+      <select id="eqFilter" onchange="switchEq(this.value)" style="font-size:15px;font-weight:600;padding:8px 16px;border:2px solid var(--navy);border-radius:6px;background:var(--white);color:var(--navy);"></select>
+      <div style="font-size:12px;color:var(--text2)" id="resultMeta"></div>
+    </div>
     <button class="btn-edit" onclick="switchMain('input')">✏️ Edit Input</button>
   </div>
 
-  <!-- Recommended PM interval (moved above the cost summary) -->
-  <div class="sec" id="secRecommend">
-    <div id="recWrap"></div>
-  </div>
-
-  <!-- Optimization total cost summary -->
-  <div class="sec" id="secPortfolio">
-    <div class="sec-title"><span class="sec-dot" style="background:var(--green)"></span>Optimization total cost summary</div>
-    <div class="kpi-grid" id="kpiGrid"><div class="ph" style="grid-column:1/-1">Run calculation first</div></div>
-  </div>
-
-  <!-- ② Bath curve -->
-  <div class="sec" id="secBath">
-    <div class="sec-title"><span class="sec-dot" style="background:var(--blue)"></span>Barlow-Proschan cost rate C(T)</div>
-    <div class="bath-chart-wrap">
-      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:4px;">
-        <div class="bath-chart-title" id="bathTitle">— select a row from the table below —</div>
-        <button onclick="resetZoom()" style="font-size:11px;padding:3px 10px;border:1px solid var(--border);border-radius:4px;background:var(--white);cursor:pointer;color:var(--text2);">↺ Reset zoom</button>
-      </div>
-      <div class="bath-chart-meta" id="bathMeta"></div>
-      <div class="bath-canvas-wrap"><canvas id="bathCanvas"></canvas></div>
-    </div>
-    <div class="adj-panel" id="adjPanel" style="display:none">
-      <div class="adj-top">
-        <div style="display:flex;flex-direction:column;gap:2px;min-width:200px;">
-          <span class="adj-label">PM Interval Adjuster</span>
-
+  <!-- ② Bath curve + Detailed results, side by side -->
+  <div style="display:flex;gap:20px;align-items:stretch;flex-wrap:wrap;">
+    <div class="sec" id="secBath" style="flex:1 1 380px;min-width:380px;margin-bottom:0;display:flex;flex-direction:column;">
+      <div class="sec-title"><span class="sec-dot" style="background:var(--blue)"></span>Barlow-Proschan cost rate C(T)</div>
+      <div class="bath-chart-wrap">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:4px;">
+          <div class="bath-chart-title" id="bathTitle">— select a row from the table below —</div>
+          <button onclick="resetZoom()" style="font-size:11px;padding:3px 10px;border:1px solid var(--border);border-radius:4px;background:var(--white);cursor:pointer;color:var(--text2);">↺ Reset zoom</button>
         </div>
-        <input type="range" class="adj-slider" id="adjSlider" min="1" max="200" step="1" value="36"
-               oninput="onAdjSlider(this.value)">
-        <span class="adj-val" id="adjVal">36 Months</span>
-        <button onclick="resetToOptimized()" style="font-size:11px;padding:6px 14px;border:1px solid var(--green-mid);border-radius:5px;background:var(--white);cursor:pointer;color:var(--green);font-weight:600;white-space:nowrap;">↺ Reset to optimal</button>
+        <div class="bath-chart-meta" id="bathMeta"></div>
+        <div class="bath-canvas-wrap"><canvas id="bathCanvas"></canvas></div>
       </div>
-      <div class="adj-cards" id="adjCards"></div>
     </div>
-  </div>
 
-  <!-- Detailed results -->
-  <div class="sec" id="secDetail">
-    <div class="sec-title"><span class="sec-dot"></span>Detailed results by equipment</div>
-    <div class="eq-tabs" id="eqTabBar"></div>
-    <div id="eqPanels"><div class="ph">Run calculation first</div></div>
+    <div class="sec" id="secDetail" style="flex:1 1 380px;min-width:380px;margin-bottom:0;">
+      <div class="sec-title"><span class="sec-dot"></span>Detailed results by equipment</div>
+      <div id="eqPanels"><div class="ph">Run calculation first</div></div>
+      <div class="adj-panel" id="adjPanel" style="display:none">
+        <div class="adj-top">
+          <div style="display:flex;flex-direction:column;gap:2px;min-width:200px;">
+            <span class="adj-label">PM Interval Adjuster</span>
+
+          </div>
+          <input type="range" class="adj-slider" id="adjSlider" min="1" max="200" step="1" value="36"
+                 oninput="onAdjSlider(this.value)">
+          <span class="adj-val" id="adjVal">36 Months</span>
+          <button onclick="resetToOptimized()" style="font-size:11px;padding:6px 14px;border:1px solid var(--green-mid);border-radius:5px;background:var(--white);cursor:pointer;color:var(--green);font-weight:600;white-space:nowrap;">↺ Reset to optimal</button>
+        </div>
+        <div class="adj-cards" id="adjCards"></div>
+      </div>
+    </div>
   </div>
 </div>
 </div>
@@ -334,12 +328,12 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
 <script>
 // ── Data ──────────────────────────────────────────────────────────────────────
 let ROWS=[
-  {on:true,eq:"Furnace J",part:"Coil (FJ)", mode:"Crack",    n:34,tot_days:86870, cm_dt:720,pm_dt:630,pm_cost:5000000,cm_cost:6000000, lph:297500,pm_int:36},
-  {on:true,eq:"Furnace J",part:"TLE (FJ)",  mode:"Crack",    n:50,tot_days:91250, cm_dt:720,pm_dt:630,pm_cost:2000000,cm_cost:2500000, lph:297500,pm_int:36},
-  {on:true,eq:"Furnace J",part:"TLE (FJ)",  mode:"Thinning", n:12,tot_days:21900, cm_dt:720,pm_dt:630,pm_cost:2000000,cm_cost:2500000, lph:297500,pm_int:36},
-  {on:true,eq:"Furnace F",part:"Coil (FF)", mode:"Crack",    n: 9,tot_days:16425, cm_dt:630,pm_dt:540,pm_cost:4000000,cm_cost:4400000, lph:297500,pm_int:36},
-  {on:true,eq:"Furnace F",part:"TLE (FF)",  mode:"Crack",    n:59,tot_days:107675,cm_dt:720,pm_dt:630,pm_cost:2000000,cm_cost:2500000, lph:297500,pm_int:36},
-  {on:true,eq:"Furnace F",part:"TLE (FF)",  mode:"Thinning", n:20,tot_days:36500, cm_dt:720,pm_dt:630,pm_cost:2000000,cm_cost:2500000, lph:297500,pm_int:36},
+  {on:true,eq:"Furnace J",part:"Coil (FJ)", mode:"Crack",    n:34,tot_days:86870, cm_dt:90,pm_dt:630,pm_cost:5000000,cm_cost:6000000, lph:297500,pm_int:36},
+  {on:true,eq:"Furnace J",part:"TLE (FJ)",  mode:"Crack",    n:50,tot_days:91250, cm_dt:90,pm_dt:630,pm_cost:2000000,cm_cost:2500000, lph:297500,pm_int:36},
+  {on:true,eq:"Furnace J",part:"TLE (FJ)",  mode:"Thinning", n:12,tot_days:21900, cm_dt:90,pm_dt:630,pm_cost:2000000,cm_cost:2500000, lph:297500,pm_int:36},
+  {on:true,eq:"Furnace F",part:"Coil (FF)", mode:"Crack",    n: 9,tot_days:16425, cm_dt:90,pm_dt:540,pm_cost:4000000,cm_cost:4400000, lph:297500,pm_int:36},
+  {on:true,eq:"Furnace F",part:"TLE (FF)",  mode:"Crack",    n:59,tot_days:107675,cm_dt:90,pm_dt:630,pm_cost:2000000,cm_cost:2500000, lph:297500,pm_int:36},
+  {on:true,eq:"Furnace F",part:"TLE (FF)",  mode:"Thinning", n:20,tot_days:36500, cm_dt:90,pm_dt:630,pm_cost:2000000,cm_cost:2500000, lph:297500,pm_int:36},
 ];
 
 // ── Tab switching ─────────────────────────────────────────────────────────────
@@ -403,7 +397,7 @@ function renderTable(){
 }
 renderTable();
 function addRow(){
-  ROWS.push({on:true,eq:'',part:'',mode:'',n:'',tot_days:'',cm_dt:'',pm_dt:'',pm_cost:'',cm_cost:'',lph:'',pm_int:''});
+  ROWS.push({on:true,eq:'',part:'',mode:'',n:'',tot_days:'',cm_dt:90,pm_dt:'',pm_cost:'',cm_cost:'',lph:'',pm_int:''});
   renderTable();
   document.getElementById('inpBody').lastElementChild?.scrollIntoView({behavior:'smooth',block:'nearest'});
 }
@@ -454,7 +448,7 @@ const OPY=8760;
 function costAt(T,b,e,pm_c,cm_c,cm_dt,pm_dt,lph){
   const RT=Rfn(T,b,e),MT=Mfn(T,b,e);
   const FF=(1-RT)/MT*OPY,pmEv=RT/MT*OPY;
-  return{tot:pm_c*pmEv+(cm_c+cm_dt*lph)*FF+(pmEv*pm_dt)*lph, RT};
+  return{tot:pm_c*pmEv+(cm_c+cm_dt*lph)*FF, RT};
 }
 function tStar(b,e,Cp,Cf,pm_dt,lph){
   // Barlow-Proschan cost rate: C(T) = [Cp·R(T) + Cf·(1-R(T))] / M(T)
@@ -480,6 +474,32 @@ function tStar(b,e,Cp,Cf,pm_dt,lph){
   return bT;
 }
 
+// ── Group (sum) Barlow-Proschan cost rate — combines every part/mode row ───────
+function groupRateAt(rows,T,n=300){
+  // Σ over rows of [Cp·R(T) + Cf·(1-R(T))] / M(T), each row using its own b,e,Cp,Cf
+  return rows.reduce((s,r)=>{
+    const RT=Rfn(T,r.b,r.e),MT=Mfn(T,r.b,r.e,n);
+    return s+(MT>0?(r.Cp*RT+r.Cf*(1-RT))/MT:0);
+  },0);
+}
+function tStarGroup(rows){
+  // Same two-pass scan as tStar(), but minimizing the summed cost-rate curve
+  let bT=24*30,bR=1e15;
+  const N=4000, Tmax=300*24*30;
+  Array.from({length:N},(_,i)=>24*30+(Tmax-24*30)/(N-1)*i).forEach(T=>{
+    const r=groupRateAt(rows,T);
+    if(r<bR){bR=r;bT=T;}
+  });
+  const bT_mo=bT/(24*30);
+  const lo=Math.max(0.5,bT_mo-5)*24*30;
+  const hi=Math.min(300,bT_mo+5)*24*30;
+  Array.from({length:200},(_,i)=>lo+(hi-lo)/199*i).forEach(T=>{
+    const r=groupRateAt(rows,T,500);
+    if(r<bR){bR=r;bT=T;}
+  });
+  return{Ts_mo:bT/(24*30),minRate:bR};
+}
+
 // ── Format ────────────────────────────────────────────────────────────────────
 function fM(v){
   if(Math.abs(v)>=1e6)return(v/1e6).toLocaleString(undefined,{minimumFractionDigits:2,maximumFractionDigits:2})+' MB/Yr';
@@ -494,11 +514,21 @@ let G_RESULTS=[];   // array of row result objects
 let G_GROUPS={};    // eq → [rows]
 let G_SLIDERS={};   // rowIdx → current slider value (months)
 let _redLineMo=null; // current value used for the red "Current PM interval" line
+let _groupBathEq=null; // equipment name currently shown in the Combined C(T) view, or null if a single row is shown
 
 // ── Bath curve chart ──────────────────────────────────────────────────────────
 let bathChart=null;
 function resetZoom(){if(bathChart)bathChart.resetZoom();}
 function resetToOptimized(){
+  if(_groupBathEq){
+    const rows=G_GROUPS[_groupBathEq]; if(!rows||!rows.length) return;
+    const{Ts_mo}=tStarGroup(rows);
+    const sl=document.getElementById('adjSlider'), sv=document.getElementById('adjVal');
+    if(sl){sl.value=Math.round(Ts_mo); if(sv) sv.textContent=Ts_mo.toFixed(1)+' '+(parseFloat(Ts_mo)===1?'Month':'Months');}
+    drawGroupBath(_groupBathEq,Ts_mo);
+    buildGroupAdjTable(_groupBathEq,Ts_mo);
+    return;
+  }
   if(!_selectedBathRow) return;
   const mo=_selectedBathRow.Ts_mo;
   // Slider/adjuster goes to the optimal T*
@@ -597,49 +627,203 @@ function drawBath(row){
   });
 }
 
-// ── Portfolio table ───────────────────────────────────────────────────────────
-function buildKPI(){
-  const grid=document.getElementById('kpiGrid'); grid.innerHTML='';
-  // KPI cards
-  Object.keys(G_GROUPS).forEach(eq=>{
-    const rows=G_GROUPS[eq]; let tCur=0,tOpt=0;
-    rows.forEach(r=>{tCur+=r.cur;tOpt+=r.opt;});
-    [{lbl:`${eq} — current`,val:fM(tCur),cls:''},
-     {lbl:`${eq} — optimized`,val:fM(tOpt),cls:'blue'},
-     {lbl:`${eq} — saving`,val:fM(tCur-tOpt),cls:'green',hi:true},
-    ].forEach(k=>{
-      const d=document.createElement('div'); d.className='kpi'+(k.hi?' hi':'');
-      d.innerHTML=`<div class="kpi-lbl">${k.lbl}</div><div class="kpi-val ${k.cls||''}">${k.val}</div>`;
-      grid.appendChild(d);
-    });
-  });
-  // Recommendation boxes — one per equipment, full width below KPI cards
-  const recWrap=document.getElementById('recWrap'); recWrap.innerHTML='';
-  Object.keys(G_GROUPS).forEach(eq=>{
-    const rows=G_GROUPS[eq];
-    const minTs=Math.min(...rows.map(r=>r.Ts_mo));
-    const driver=rows.find(r=>r.Ts_mo===minTs);
-    if(!driver) return;
-    const moTxt=minTs.toFixed(1);
-    const unit=Math.round(minTs*10)===10?'Month':'Months';
-    const div=document.createElement('div'); div.className='rec-box';
-    div.innerHTML=`
-      <span class="rec-icon">★</span>
-      <span class="rec-text">
-        <strong>${eq} — Recommendation:</strong>
-        Set PM interval to
-        <span class="rec-mo">${moTxt}</span>
-        <span class="rec-unit">${unit}</span>
-        — driven by <strong>${driver.label}</strong>
-      </span>`;
-    recWrap.appendChild(div);
+function showGroupBath(eq){
+  eq=eq||getActiveEq();
+  const rows=eq&&G_GROUPS[eq];
+  if(!rows||!rows.length) return;
+  _groupBathEq=eq;
+  _selectedBathRow=null;
+  _redLineMo=null;
+  const{Ts_mo}=tStarGroup(rows);
+  const sl=document.getElementById('adjSlider'), sv=document.getElementById('adjVal');
+  if(sl){sl.value=Math.round(Ts_mo); if(sv) sv.textContent=Ts_mo.toFixed(1)+' '+(parseFloat(Ts_mo)===1?'Month':'Months');}
+  drawGroupBath(eq,Ts_mo);
+  buildGroupAdjTable(eq,Ts_mo);
+  document.getElementById('secBath').scrollIntoView({behavior:'smooth',block:'start'});
+}
+
+function drawGroupBath(eq,sliderMo){
+  const rows=G_GROUPS[eq];
+  if(!rows||!rows.length) return;
+  document.getElementById('bathTitle').textContent=`${eq} — Combined (${rows.length} part/modes)`;
+  document.getElementById('bathMeta').textContent='Sum of Barlow-Proschan cost-rate curves across all part/modes of this equipment';
+
+  const{Ts_mo:minMo}=tStarGroup(rows);
+  const adjMo=sliderMo!=null?sliderMo:minMo;
+  const xMax=Math.min(Math.max(minMo*2.5,adjMo*1.3,...rows.map(r=>r.e/(24*30)*1.5)),200);
+  const N=400;
+  const xs=Array.from({length:N},(_,i)=>1+(xMax-1)/(N-1)*i);
+  const ys=xs.map(mo=>groupRateAt(rows,mo*30*24));
+
+  const minY=ys[Math.round((minMo-1)/(xMax-1)*(N-1))]||Math.min(...ys.filter(y=>y!==null));
+  // "Current" reference: each row evaluated at its own actual current interval, summed —
+  // there's no single shared T for "current" since rows may have different PM intervals today.
+  const currentTotalRate=rows.reduce((s,r)=>{
+    const T=r.T_cur_mo*30*24,RT=Rfn(T,r.b,r.e),MT=Mfn(T,r.b,r.e);
+    return s+(MT>0?(r.Cp*RT+r.Cf*(1-RT))/MT:0);
+  },0);
+  // Adjuster (PM Interval Adjuster slider) — hypothetical single shared T applied to the whole group
+  const adjIdx=Math.max(0,Math.min(N-1,Math.round((adjMo-1)/(xMax-1)*(N-1))));
+  const adjY=ys[adjIdx]!=null?ys[adjIdx]:groupRateAt(rows,adjMo*30*24);
+  const yMax=Math.max(minY*2.2,currentTotalRate*1.15,adjY*1.15);
+
+  if(bathChart) bathChart.destroy();
+  const ctx=document.getElementById('bathCanvas').getContext('2d');
+
+  const drawPlugin={
+    id:'overlayGroup',
+    afterDraw(ch){
+      const{ctx:c2,scales:{x,y}}=ch;
+      // T_sum* line (combined optimum)
+      const xpTs=x.getPixelForValue(minMo), yTop=y.top, yBot=y.bottom;
+      c2.save();
+      c2.setLineDash([5,4]); c2.strokeStyle='#2E6B11'; c2.lineWidth=1.8;
+      c2.beginPath(); c2.moveTo(xpTs,yTop); c2.lineTo(xpTs,yBot); c2.stroke();
+      c2.setLineDash([]);
+      const ypTs=y.getPixelForValue(Math.min(minY,yMax*0.99));
+      c2.fillStyle='#2E6B11'; c2.beginPath(); c2.arc(xpTs,ypTs,5,0,Math.PI*2); c2.fill();
+      c2.font='bold 10px sans-serif'; c2.fillStyle='#2E6B11'; c2.textAlign='center';
+      c2.fillText(`T_sum*=${minMo.toFixed(1)} mo`,xpTs,yTop+12);
+      // Current total — horizontal reference (sum of each row's own current interval)
+      const ypCur=y.getPixelForValue(Math.min(currentTotalRate,yMax*0.99));
+      c2.strokeStyle='#A32D2D'; c2.lineWidth=1.8; c2.setLineDash([4,3]);
+      c2.beginPath(); c2.moveTo(x.left,ypCur); c2.lineTo(x.right,ypCur); c2.stroke();
+      c2.setLineDash([]);
+      c2.font='bold 10px sans-serif'; c2.fillStyle='#A32D2D'; c2.textAlign='left';
+      c2.fillText(`Current total ≈ ${currentTotalRate.toExponential(2)}`,x.left+6,ypCur-6);
+      // Adjuster line (PM Interval Adjuster slider) — vertical, shared-T what-if
+      const xpAdj=x.getPixelForValue(adjMo);
+      c2.strokeStyle='#7A4500'; c2.lineWidth=1.8; c2.setLineDash([4,3]);
+      c2.beginPath(); c2.moveTo(xpAdj,yTop); c2.lineTo(xpAdj,yBot); c2.stroke();
+      c2.setLineDash([]);
+      const ypAdj=y.getPixelForValue(Math.min(adjY,yMax*0.99));
+      c2.fillStyle='#7A4500'; c2.beginPath(); c2.arc(xpAdj,ypAdj,4,0,Math.PI*2); c2.fill();
+      c2.font='bold 10px sans-serif'; c2.fillStyle='#7A4500'; c2.textAlign='center';
+      c2.fillText(`Adjuster=${adjMo.toFixed(1)} mo`,xpAdj,yBot-6);
+      c2.restore();
+    }
+  };
+
+  bathChart=new Chart(ctx,{
+    type:'line',
+    data:{
+      labels:xs,
+      datasets:[{
+        data:ys.map((y,i)=>({x:xs[i],y})),
+        borderColor:'#185FA5',borderWidth:2.5,pointRadius:0,fill:false,tension:0.3,spanGaps:true
+      }]
+    },
+    options:{
+      responsive:true,maintainAspectRatio:false,animation:{duration:300},
+      scales:{
+        x:{type:'linear',min:1,max:xMax,
+           title:{display:true,text:'PM Interval (months)',font:{size:11}},
+           ticks:{font:{size:10},maxTicksLimit:10}},
+        y:{min:0,max:yMax,
+           title:{display:true,text:'Total Cost Rate ΣC(T)',font:{size:11}},
+           ticks:{font:{size:10},maxTicksLimit:6}}
+      },
+      plugins:{
+        zoom:{
+          zoom:{wheel:{enabled:true},pinch:{enabled:true},mode:'xy'},
+          pan:{enabled:true,mode:'xy'}
+        },
+        legend:{display:false},
+        tooltip:{callbacks:{
+          title:i=>`T = ${Number(i[0].label).toFixed(1)} months`,
+          label:i=>`ΣC(T) = ${i.parsed.y!=null?i.parsed.y.toExponential(3):'-'}`
+        }}
+      }
+    },
+    plugins:[drawPlugin]
   });
 }
+
+function buildGroupAdjTable(eq,mo){
+  const wrap=document.getElementById('adjCards'); if(!wrap) return;
+  wrap.innerHTML='';
+  const rows=G_GROUPS[eq]; if(!rows||!rows.length) return;
+
+  const beforeTotal=rows.reduce((s,r)=>s+r.cur,0);
+  const T_adj=mo*30*24;
+  let afterTotal=0,rSum=0;
+  rows.forEach(r=>{
+    const c=costAt(T_adj,r.b,r.e,r.Cp,r.cm_cost,r.cm_dt,r.pm_dt,r.lph);
+    afterTotal+=c.tot; rSum+=c.RT;
+  });
+  const avgR=rSum/rows.length;
+  const saving=beforeTotal-afterTotal;
+  const savColor=saving>0?'var(--green)':'var(--red)';
+  const savText=saving>0?fM(saving):'−'+fM(-saving);
+
+  const grpDiv=document.createElement('div'); grpDiv.className='adj-eq-group';
+  const rowWrap=document.createElement('div'); rowWrap.className='adj-row-wrap';
+  const pairTitle=document.createElement('div');
+  pairTitle.style.cssText='grid-column:1/-1;font-size:13px;font-weight:600;color:var(--dblue);margin-bottom:2px;margin-top:6px;';
+  pairTitle.textContent=`${eq} — Combined (${rows.length} part/modes)`;
+  rowWrap.appendChild(pairTitle);
+
+  const card=document.createElement('div');
+  card.className='adj-card';
+  card.innerHTML=`
+    <div class="adj-card-hdr">Before (each part/mode at its own current interval)</div>
+    <div class="adj-card-body">
+      <div class="adj-cell">
+        <div class="adj-cell-lbl">PM Interval</div>
+        <div class="adj-cell-val" style="color:var(--text2)">Mixed (per-part)</div>
+      </div>
+      <div class="adj-cell">
+        <div class="adj-cell-lbl">% Reliability</div>
+        <div class="adj-cell-val" style="color:var(--text3)">—</div>
+      </div>
+      <div class="adj-cell">
+        <div class="adj-cell-lbl">Total Cost /yr</div>
+        <div class="adj-cell-val">${fM(beforeTotal)}</div>
+      </div>
+      <div class="adj-cell">
+        <div class="adj-cell-lbl">Saving</div>
+        <div class="adj-cell-val" style="color:var(--text3)">—</div>
+      </div>
+    </div>`;
+  rowWrap.appendChild(card);
+
+  const cardOpt=document.createElement('div');
+  cardOpt.className='adj-card adj-card-opt';
+  cardOpt.innerHTML=`
+    <div class="adj-card-hdr">Optimized (one shared interval for all)</div>
+    <div class="adj-card-body">
+      <div class="adj-cell">
+        <div class="adj-cell-lbl">PM Interval</div>
+        <div class="adj-cell-val" style="color:var(--green-mid)">${fMo(mo)}</div>
+      </div>
+      <div class="adj-cell">
+        <div class="adj-cell-lbl">Avg. Reliability</div>
+        <div class="adj-cell-val" style="color:${avgR>0.99?'var(--green)':'var(--amber)'}">${fR(avgR)}</div>
+      </div>
+      <div class="adj-cell">
+        <div class="adj-cell-lbl">Total Cost /yr</div>
+        <div class="adj-cell-val" style="color:var(--green);font-weight:700">${fM(afterTotal)}</div>
+      </div>
+      <div class="adj-cell">
+        <div class="adj-cell-lbl">Saving</div>
+        <div class="adj-cell-val" style="color:${savColor};font-weight:700">${savText}</div>
+      </div>
+    </div>`;
+  rowWrap.appendChild(cardOpt);
+
+  grpDiv.appendChild(rowWrap); wrap.appendChild(grpDiv);
+}
+
 function onAdjSlider(val){
   const mo=parseFloat(val);
   document.getElementById('adjVal').textContent=mo.toFixed(0)+' '+(parseFloat(mo)===1?'Month':'Months');
   // Clear any "reset to optimal" override so the red marker tracks the slider again
   _redLineMo=null;
+  if(_groupBathEq){
+    drawGroupBath(_groupBathEq,mo);
+    buildGroupAdjTable(_groupBathEq,mo);
+    return;
+  }
   // Update current slider value for the selected row
   if(_selectedBathRow){
     G_SLIDERS[_selectedBathRow._idx]=mo;
@@ -731,10 +915,10 @@ function buildAdjTable(mo){
 }
 
 
-function buildResTable(id,rows){
+function buildResTable(id,rows,eq){
   const tbl=document.getElementById(id); tbl.innerHTML='';
   const hr=tbl.createTHead().insertRow();
-  ['Part / Mode','Opp Loss (THB/hr)','PM Interval (optimized)','%Reliability (optimized)',
+  ['Part / Mode','PM Interval (optimized)','%Reliability (optimized)',
    'Current total','Optimized total','Saving'].forEach(h=>{
     const th=document.createElement('th'); th.textContent=h; hr.appendChild(th);
   });
@@ -742,8 +926,7 @@ function buildResTable(id,rows){
   rows.forEach(r=>{
     const tr=tb.insertRow(); const sav=r.cur-r.opt;
     tr.innerHTML=`
-      <td style="font-weight:600;white-space:nowrap">${r.label}</td>
-      <td style="color:var(--text2)">${r.lph.toLocaleString()}</td>
+      <td style="font-weight:600">${r.label}</td>
       <td>${fMo(r.Ts_mo)}</td>
       <td style="color:${r.rOpt>0.99?'var(--green)':'var(--amber)'}">${fR(r.rOpt)}</td>
       <td>${fM(r.cur)}</td>
@@ -754,6 +937,7 @@ function buildResTable(id,rows){
       document.querySelectorAll('table.res tbody tr').forEach(t=>t.classList.remove('row-selected'));
       tr.classList.add('row-selected');
       _selectedBathRow=r;
+      _groupBathEq=null;
       // Red "Current PM interval" line marks on the row's input value (T_cur_mo)
       _redLineMo = r.T_cur_mo;
       // Sync slider to this row's current PM interval
@@ -768,7 +952,12 @@ function buildResTable(id,rows){
     tC+=r.cur; tO+=r.opt;
   });
   const sub=tb.insertRow(); sub.className='sub';
-  sub.innerHTML=`<td colspan="4" style="text-align:left">TOTAL</td><td>${fM(tC)}</td><td>${fM(tO)}</td><td>${fM(tC-tO)}</td>`;
+  sub.innerHTML=`<td colspan="3" style="text-align:left">Σ Combination of all Part/Mode</td><td>${fM(tC)}</td><td>${fM(tO)}</td><td>${fM(tC-tO)}</td>`;
+  sub.title='Click to view the combined Barlow-Proschan cost curve for this equipment';
+  sub.addEventListener('click',()=>{
+    document.querySelectorAll('table.res tbody tr').forEach(t=>t.classList.remove('row-selected'));
+    showGroupBath(eq);
+  });
   return{cur:tC,opt:tO};
 }
 
@@ -809,43 +998,27 @@ function runCalc(){
 
       const eqNames=Object.keys(G_GROUPS);
 
-      // ① Portfolio KPI cards
-      buildKPI();
-
-      // ② Bath curve — auto-select first row
-      if(G_RESULTS.length){
-        _selectedBathRow=G_RESULTS[0];
-        // Red "Current PM interval" line marks on the row's input value (T_cur_mo)
-        _redLineMo=G_RESULTS[0].T_cur_mo;
-        drawBath(G_RESULTS[0]);
-      }
-      // Build adjuster panel
-      const adjPanel=document.getElementById('adjPanel');
-      adjPanel.style.display='block';
-      // Init slider to first row's current PM interval
-      if(G_RESULTS.length){
-        const initMo=G_RESULTS[0].Ts_mo||36;
-        document.getElementById('adjSlider').value=Math.round(initMo);
-        document.getElementById('adjVal').textContent=initMo.toFixed(1)+' '+(parseFloat(initMo)===1?'Month':'Months');
-        buildAdjTable(initMo);
-      }
-
-      // Equipment tabs + detail tables
-      const eqTabBar=document.getElementById('eqTabBar'), eqPanels=document.getElementById('eqPanels');
-      eqTabBar.innerHTML=''; eqPanels.innerHTML='';
+      // Equipment filter + detail tables (populated first so KPI/Recommendation below can follow it)
+      const eqFilter=document.getElementById('eqFilter'), eqPanels=document.getElementById('eqPanels');
+      eqFilter.innerHTML=''; eqPanels.innerHTML='';
       eqNames.forEach((eq,ei)=>{
-        const btn2=document.createElement('button');
-        btn2.className='eq-tab'+(ei===0?' active':'');
-        btn2.textContent=eq; btn2.onclick=()=>switchEq(eq,eqNames);
-        eqTabBar.appendChild(btn2);
+        const opt=document.createElement('option');
+        opt.value=eq; opt.textContent=eq;
+        eqFilter.appendChild(opt);
         const panel=document.createElement('div');
         panel.className='eq-panel'+(ei===0?' active':'');
         panel.id='ep-'+eq.replace(/\W/g,'_');
         panel.innerHTML=`<div class="tbl-wrap"><table class="res" id="rt-${ei}"></table></div>
           <p class="hint">Click any row to view its Barlow-Proschan cost curve above</p>`;
         eqPanels.appendChild(panel);
-        buildResTable(`rt-${ei}`,G_GROUPS[eq]);
+        buildResTable(`rt-${ei}`,G_GROUPS[eq],eq);
       });
+      if(eqNames.length) eqFilter.value=eqNames[0];
+
+      // ② Bath curve — default to the Combined C(T) view for the first equipment
+      const adjPanel=document.getElementById('adjPanel');
+      adjPanel.style.display='block';
+      if(eqNames.length) showGroupBath(eqNames[0]);
 
       const now=new Date();
       document.getElementById('resultMeta').textContent=
@@ -860,9 +1033,17 @@ function runCalc(){
   },60);
 }
 
-function switchEq(eq,names){
-  document.querySelectorAll('.eq-tab').forEach((t,i)=>t.classList.toggle('active',names[i]===eq));
+function switchEq(eq){
   document.querySelectorAll('.eq-panel').forEach(p=>p.classList.toggle('active',p.id==='ep-'+eq.replace(/\W/g,'_')));
+  const sel=document.getElementById('eqFilter');
+  if(sel&&sel.value!==eq) sel.value=eq;
+}
+function getActiveEq(){
+  // Default equipment for combined-view calls without an explicit eq — follows the top "Filter Equipment" select,
+  // falling back to the first group if nothing is selected yet.
+  const sel=document.getElementById('eqFilter');
+  if(sel&&sel.value&&G_GROUPS[sel.value]) return sel.value;
+  return Object.keys(G_GROUPS)[0];
 }
 
 // ── Excel column mapping ─────────────────────────────────────────────────────
